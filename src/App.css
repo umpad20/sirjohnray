@@ -1,0 +1,65 @@
+/* App Container */
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Enhanced focus visible styles - Premium */
+:focus-visible {
+  outline: 2px solid #22c55e; /* green-500 */
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+}
+
+/* Selection styling - Premium */
+::selection {
+  background-color: #16a34a; /* green-600 */
+  color: white;
+}
+
+::-moz-selection {
+  background-color: #16a34a; /* green-600 */
+  color: white;
+}
+
+/* Smooth scrolling with preference respect */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background-color: white;
+  }
+
+  nav, footer {
+    display: none;
+  }
+}
