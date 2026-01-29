@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import emailjs from '@emailjs/browser';
 import Button from '../components/Button';
 
 const Contact = () => {
@@ -7,34 +8,36 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null);
 
-    try {
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+    // Replace with your EmailJS service ID, template ID, and Public Key
+    const serviceID = 'service_qhn92l1';
+    const templateID = 'template_u6lqc8f';
+    const publicKey = 'ZWCyj4Sw5T-a41WeL'; 
+
+    const templateParams = {
+      from_name: formData.name,
+      from_email: formData.email,
+      message: formData.message
+    };
+
+    emailjs.send(serviceID, templateID, templateParams, publicKey)
+      .then((response) => {
+        console.log('SUCCESS!', response.status, response.text);
+        setSubmitted(true);
+        setError(null);
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setSubmitted(false), 5000);
+      })
+      .catch((err) => {
+        console.log('FAILED...', err);
+        setError('Failed to send message. Please try again later.');
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong.');
-      }
-
-      setSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setSubmitted(false), 5000);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const handleChange = (e) => {
