@@ -1,16 +1,44 @@
 import React, { useState } from 'react';
+import emailjs from '@emailjs/browser';
 import Button from '../components/Button';
 
 const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
-    setFormData({ name: '', email: '', message: '' });
-    setTimeout(() => setSubmitted(false), 5000);
+    setIsSubmitting(true);
+
+    // Replace with your EmailJS service ID, template ID, and Public Key
+    const serviceID = 'service_qhn92l1';
+    const templateID = 'template_u6lqc8f';
+    const publicKey = 'ZWCyj4Sw5T-a41WeL'; 
+
+    const templateParams = {
+      from_name: formData.name,
+      from_email: formData.email,
+      message: formData.message
+    };
+
+    emailjs.send(serviceID, templateID, templateParams, publicKey)
+      .then((response) => {
+        console.log('SUCCESS!', response.status, response.text);
+        setSubmitted(true);
+        setError(null);
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setSubmitted(false), 5000);
+      })
+      .catch((err) => {
+        console.log('FAILED...', err);
+        setError('Failed to send message. Please try again later.');
+        // You might want to show an error message to the user
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   };
 
   const handleChange = (e) => {
@@ -47,6 +75,12 @@ const Contact = () => {
               <div className="p-4 bg-green-900/50 border border-green-400/50 text-green-300 rounded-lg text-sm font-medium flex items-center gap-3 animate-in fade-in slide-in-from-top">
                 <span className="text-lg">✓</span>
                 <span>Thank you for your message! I'll get back to you within 48 hours.</span>
+              </div>
+            )}
+            {error && (
+              <div className="p-4 bg-red-900/50 border border-red-400/50 text-red-300 rounded-lg text-sm font-medium flex items-center gap-3 animate-in fade-in slide-in-from-top">
+                <span className="text-lg">✗</span>
+                <span>{error}</span>
               </div>
             )}
 
@@ -99,8 +133,8 @@ const Contact = () => {
             </div>
             
             <div className="text-center">
-                <Button type="submit" size="lg" className="w-full sm:w-auto">
-                  Send Message
+                <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSubmitting}>
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </Button>
             </div>
           </form>
