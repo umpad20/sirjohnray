@@ -20,15 +20,18 @@ const Contact = () => {
         message: formData.message,
       }),
     })
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed');
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({ error: res.statusText }));
+          throw new Error(data.error || `Error ${res.status}`);
+        }
         setSubmitted(true);
         setError(null);
         setFormData({ name: '', email: '', message: '' });
         setTimeout(() => setSubmitted(false), 5000);
       })
-      .catch(() => {
-        setError('Failed to send message. Please try again later.');
+      .catch((err) => {
+        setError(err.message || 'Failed to send message. Please try again later.');
       })
       .finally(() => {
         setIsSubmitting(false);
