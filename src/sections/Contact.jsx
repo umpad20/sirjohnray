@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import emailjs from '@emailjs/browser';
 import Button from '../components/Button';
 
 const Contact = () => {
@@ -12,27 +11,23 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Replace with your EmailJS service ID, template ID, and Public Key
-    const serviceID = 'service_qhn92l1';
-    const templateID = 'template_u6lqc8f';
-    const publicKey = 'ZWCyj4Sw5T-a41WeL'; 
-
-    const templateParams = {
-      from_name: formData.name,
-      from_email: formData.email,
-      message: formData.message
-    };
-
-    emailjs.send(serviceID, templateID, templateParams, publicKey)
-      .then((response) => {
-        console.log('SUCCESS!', response.status, response.text);
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed');
         setSubmitted(true);
         setError(null);
         setFormData({ name: '', email: '', message: '' });
         setTimeout(() => setSubmitted(false), 5000);
       })
-      .catch((err) => {
-        console.log('FAILED...', err);
+      .catch(() => {
         setError('Failed to send message. Please try again later.');
       })
       .finally(() => {
